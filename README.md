@@ -2,7 +2,11 @@ Analyze the result from the Toronto E-bike survey.
 
 -This is just a fun project that practicing Python skills :)
 
--Data is open souce.(2271 people participate)
+-Open souce data.(2271 people participate)
+
+-Objective:
+1)Treate the each questions as dependent variable. Understand why people answer differently.
+
 
 Survey questions:
 
