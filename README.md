@@ -4,9 +4,10 @@ Analyze the result from the Toronto E-bike survey.
 
 Survey questions:
 
-0)'Timestamp'
-1)'What age range do you fall in?'
-2)'Sex'
+0)'Timestamp'\
+1)'What age range do you fall in?'\
+
+2)'Sex'\
 3)'How would you describe your level of physical health?'
 4)'What level of education have you reached?'
 5)'What is your household income?'
