@@ -38,13 +38,8 @@ surveydata = surveydata.rename(columns = {'Timestamp':'time', '1. What age range
 'Sidewalks are for pedestrians.  Cyclists and e-bikers should not ride or drive on sidewalks.  With regards to illegal use of bicycles and e-bikes on sidewalks, should the City.': 'sidewalk_issue', \
 'Toronto Bylaws consider personal mobility devices (such as electric wheel chairs) to be pedestrians.  Historically, there has been little risk as electric wheelchairs available for purchase have only traveled at speeds which are close to walking speed.  More recently, personal mobility devices which resemble e-bikes and may travel at more than triple walking speed have become available.  In your opinion, should the City;': 'personal_mobility_devices'})
  
-
-surveydata.head(n=1)
-
-print(surveydata.describe())
-
-# Understand who interviewed?
-
+ 
+############# Understand who interviewed?
 from pandasql import sqldf
 pysqldf = lambda q: sqldf(q,globals())
   
@@ -56,75 +51,52 @@ for i in list(range(22)):
 print (pysqldf(querylist[7]))
 
 
-# build up the summary dataframe 
+####### Gender_Summary
 d = {'Gender':['Male', 'Female', 'NA', 'other'],
      'Number':[1554,657,51,10]}
 Gender_result = pd.DataFrame(d)     
 
-income_result = pd.DataFrame(pysqldf(querylist[5]))
 
+####### Income Summary
+income_result = pd.DataFrame(pysqldf(querylist[5]))
+#income_result['household_income']=income_result['household_income'].replace('None','NA')
+
+
+####### Region Summay
 region_summary = pd.DataFrame(pysqldf(querylist[7]))
 
-test = region_summary.copy()
-test[test.Num < 10].sum()
+region_summaryq1 = '''SELECT SUM(a.Num), a.address_district
+                      FROM (SELECT Num, 
+                                CASE 
+                                    WHEN Num<10 THEN 'Others'
+                                    ELSE address_district
+                                END AS address_district
+                            FROM region_summary) as a
+                      GROUP BY a.address_district;'''
 
-sum(test.Num>100)
+region_summary_fixed = pd.DataFrame(pysqldf(region_summaryq1))
 
-
-
-
-testquery1 = '''SELECT Num, (CASE address_district
-                WHEN Num<=10 THEN 'Others'
-                ELSE address_district
-                END)
-                FROM region_summary;'''
-                
-print (pysqldf(testquery1))
 
 
 
 # Visulization 
 import matplotlib.pyplot as plt
- 
-labels = Gender_result.Gender
+
+
+####### Gender_Summary
+label_test = []
+for i in list(range(4)):
+    label_test.append(str(Gender_result.Gender[i]) + ' (' + str(Gender_result.Number[i]) + ')')
+
 sizes = Gender_result.Number
-colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+colors = ["#E13F29", "#D69A80", "#D63B59", "#AE5552"]
+patches, texts = plt.pie(sizes, colors=colors, startangle=90)
+plt.legend(patches, label_test, loc="best")
 
-plt.pie(sizes, colors=colors, labels=labels, shadow=False, startangle=90)
-plt.legend(patches, labels, loc="best")
+plt.title('gender summary',y=1.08)
 plt.axis('equal')
-#plt.tight_layout()
+plt.tight_layout()
 plt.show()
-
-
-
-
-import plotly.plotly as py
-import plotly.graph_objs as go
-
-labels = Gender_result.Gender
-values = Gender_result.Number
-
-trace = go.Pie(labels=labels, values=values)
-py.iplot([trace], filename='basic_pie_chart')
-
-
-
-
-
-
-
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-x = np.arange(0, 5, 0.1);
-y = np.sin(x)
-plt.plot(x, y)
-
-
-
 
 
 
